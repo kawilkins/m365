@@ -1,8 +1,11 @@
-# Powershell script that checks the last time a password was updated.
-# Will need to make sure that Microsoft Graph is installed.
-#
-# Set-ExecutionPolicy -ExecutionPolicy bypass
-# Install-Module Microsoft.Graph -Scope CurrentUser -Repository PSGallery
+<#
+Author: Kevin Wilkins
+Date: 02/10/2025
+Description: 
+Powershell script that checks the last time a password was updated.
+Output is exported to a CSV file that is then stored in the users
+Downloads directory.
+#>
 
 if ($IsLinux) {
     $csvPath = "/home/$([System.Environment]::UserName)/Downloads"

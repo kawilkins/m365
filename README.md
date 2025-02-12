@@ -1,7 +1,8 @@
 # Microsoft 365 Powershell
 
-This repository contains a curated collection of PowerShell scripts designed specifically for interacting with Microsoft 365.
-This is a repo that is under development, please feel free to follow.
+This repository contains a collection of PowerShell scripts designed specifically for interacting with Microsoft 365.
+I have researched and written these scripts with the intention of maximizing effectiveness and productivity.
+The repo is under development, please feel free to follow for updates.
 
 ## License and disclaimer
 

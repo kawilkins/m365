@@ -21,6 +21,13 @@ Always make sure you have permission to execute or download scripts and software
 - A valid and provisioned Microsoft 365 tenant.
 - Valid and active administrator role in your Microsoft 365 tenant.
 
+## Script requirements
+
+I am developing scripts to make use of a PowerShell data file (`.psd1`) that I have named `mstenant.psd1`.
+This file can be populated with information about your specific Microsoft 365 tenant.
+The reason is so that scripts that require specific information about the Microsoft 365 tenant (i.e. the domain) can be easily accessed by the script.
+It is up to you to download `mstenant.psd1` and customize it to your specific environment.
+
 ## Contribution guidelines
 
 I welcome contributions and recommendations to improve and expand the quality.

@@ -21,21 +21,21 @@ foreach ($user in $users) {
     $email = "$userName@$tenant"
     $passwd = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 10 | ForEach-Object {[char]$_})
 
-    New-Mailbox `
-        -Name $userName `
-        -Alias $userName `
-        -FirstName $firstName `
-        -LastName $lastName `
-        -DisplayName "$firstName $lastName" `
-        -MicrosoftOnlineServicesID $email `
-        -PrimarySmtpAddress $email `
-        -Password (ConvertTo-SecureString -String $passwd -AsPlainText -Force) `
-        -ResetPasswordOnNextLogon $true
+    $params = @{
+        Name = $userName
+        Alias = $userName
+        FirstName = $firstName
+        LastName = $lastName
+        DisplayName = "$firstName $lastName"
+        MicrosoftOnlineServicesID = $email
+        PrimarySmtpAddress = $email
+        Password = (ConvertTo-SecureString -String $passwd -AsPlainText -Force)
+        ResetPasswordOnNextLogon = $true
+    }
+    $output = @{
+        Content = "`n$firstName $lastName`nEmail: $email`nPassword: $passwd`n"
+    }
 
-    Write-Host @"
-$firstName $lastName
-Email: $email
-Password: $passwd
-
-"@
+    New-Mailbox @params -WhatIf
+    Write-Host $output.Content
 }

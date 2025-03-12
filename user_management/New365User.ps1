@@ -36,6 +36,6 @@ foreach ($user in $users) {
         Content = "`n$firstName $lastName`nEmail: $email`nPassword: $passwd`n"
     }
 
-    New-Mailbox @params -WhatIf
+    New-Mailbox @params
     Write-Host $output.Content
 }

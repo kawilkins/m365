@@ -11,9 +11,11 @@ $domains = Import-Csv -Path $blockDomains
 foreach ($domain in $domains) {
     $denyDomain = $domain.Domain
 
-    New-TenantAllowBlockListItems `
-        -ListType Sender `
-        -Block `
-        -Entries "$denyDomain" `
-        -NoExpiration
+    $blockItems = @{
+        ListType = "Sender"
+        Block = $true
+        Entries = "$denyDomain"
+        NoExpiration = $true
+    }
+    New-TenantAllowBlockListItems @blockItems
 }

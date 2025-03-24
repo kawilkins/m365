@@ -18,12 +18,15 @@ $tenant = $config.domain
 $userName = Read-Host "Username: "
 $passwd = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 12 | ForEach-Object {[char]$_})
 
-Update-MgUser `
-    -UserId "$userName@$tenant" `
-    -PasswordProfile @{
-        ForceChangePasswordNextSignIn = $True;
-        Password = "$passwd"
-    } `
-    -AccountEnabled $false
+$passwordProfile = @{
+    ForceChangePasswordNextSignIn = $True
+    Password = "$passwd"
+}
+$UpdateMgUser = @{
+    UserId = "$username@$tenant"
+    PasswordProfile = $passwordProfile
+    AccountEnabled = $false
+}
 
+Update-MgUser @UpdateMgUser
 Revoke-MgUserSignInSession -UserId "$userName@$tenant"

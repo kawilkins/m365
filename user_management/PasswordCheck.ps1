@@ -18,7 +18,21 @@ if ($IsLinux) {
 }
 $csvFile = "UserLastPasswordChange.csv"
 
-Get-MgUser -All -Property DisplayName, UserPrincipalName, LastPasswordChangeDateTime `
-    | Select-Object -Property DisplayName,UserPrincipalName,LastPasswordChangeDateTime `
-    | Sort-Object -Property LastPasswordChangeDateTime -Descending `
-    | Export-Csv -Path $csvPath/$csvFile -NoTypeInformation -Encoding UTF8
+$mgUser = @{
+    All = $true
+    Property = "DisplayName", "UserPrincipalName", "LastPasswordChangeDateTime"
+}
+$select = @{
+    Property = "DisplayName", "UserPrincipalName", "LastPasswordChangeDateTime"
+}
+$sort = @{
+    Property = "LastPasswordChangeDateTime"
+    Descending = $true
+}
+$export = @{
+    Path = "$csvPath/$csvFile"
+    NoTypeInformation = $true
+    Encoding = "UTF8"
+}
+
+Get-MgUser @mgUser | Select-Object @select | Sort-Object @sort | Export-Csv @export

@@ -12,10 +12,14 @@ $config = Import-PowershellDataFile -Path .\mstenant.psd1
 $tenant = $config.domain
 $username = Read-Host "Username"
 
-Connect-ExchangeOnline `
-    -UserPrincipalName $username@$tenant
-
-Connect-MgGraph -Scopes `
-    "User.ReadWrite.All", `
-    "Group.ReadWrite.All", `
+$exchangeonline = @{
+    UserPrincipalName = "$username@$tenant"
+}
+$graphScopes = @{
+    "User.ReadWrite.All",
+    "Group.ReadWrite.All",
     "LicenseAssignment.ReadWrite.All"
+}
+
+Connect-ExchangeOnline @exchangeonline
+Connect-MgGraph -Scopes $scopes

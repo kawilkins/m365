@@ -15,11 +15,11 @@ $username = Read-Host "Username"
 $exchangeonline = @{
     UserPrincipalName = "$username@$tenant"
 }
-$graphScopes = @{
+$scopes = @(
     "User.ReadWrite.All",
     "Group.ReadWrite.All",
     "LicenseAssignment.ReadWrite.All"
-}
+)
 
 Connect-ExchangeOnline @exchangeonline
 Connect-MgGraph -Scopes $scopes

@@ -1,4 +1,7 @@
-# Microsoft 365 Powershell
+Microsoft 365 PowerShell
+===============
+
+## Description
 
 This repository contains a collection of PowerShell scripts designed specifically for interacting with Microsoft 365.
 I have researched and written these scripts with the intention of maximizing effectiveness and productivity.
@@ -10,16 +13,40 @@ This repository is licensed under the MIT License.
 See the **LICENSE** file for more information and details.
 
 All PowerShell scripts are available for use with no liability to the user or devices that downloads and executes the scripts contained herein.
-It is best practice to thoroughly review, test, and use **with caution** script or software downloaded from the internet.
-Always make sure you have permission to execute or download scripts and software for use on your network.
+It is best practice to thoroughly review and test scripts or software downloaded from the internet in a segregated network or laboratory environment prior to production use.
+Always make sure you have permission to execute or download scripts and software for use (**with caution**) on your network.
 
 ## Prerequisites
 
-- A system running the most current version of PowerShell.
-- Microsoft Exchange Online PowerShell module.
-- Microsoft Graph PowerShell module.
-- A valid and provisioned Microsoft 365 tenant.
-- Valid and active administrator role in your Microsoft 365 tenant.
+- [ ] A system running the most current version of PowerShell.
+- [ ] Microsoft Exchange Online PowerShell module.
+- [ ] Microsoft Graph PowerShell module.
+- [ ] A valid and provisioned Microsoft 365 tenant.
+- [ ] Valid and active administrator role in your Microsoft 365 tenant.
+
+## Install PowerShell
+
+### Linux
+
+To download PowerShell to use on Linux use the following command:
+
+```
+snap install powershell --channel=lts/stable --classic
+```
+
+### MacOS
+
+To download PowerShell to use on MacOS use the following command:
+
+```
+brew install --cask powershell
+```
+
+### Run PowerShell (Linux and MacOS)
+
+```
+pwsh
+```
 
 ## Script requirements
 

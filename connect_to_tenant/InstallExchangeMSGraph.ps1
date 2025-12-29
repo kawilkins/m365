@@ -1,13 +1,28 @@
 <#
-Author: Kevin Wilkins
-Date: 02/14/2025
-Description: 
-This script will install and import Exchange Online PowerShell
-and Microsoft Graph modules.
+.SYNOPSIS
+    Install ExchangeOnline and Microsoft Graph modules.
 
-Be sure to have your Execution Policy set.
+.DESCRIPTION
+    Script will install both of these modules:
+    1. ExchangeOnlineManagement
+    2. Microsoft.Graph
 
-Set-ExecutionPolicy -ExecutionPolicy bypass
+    These modules are needed to interact with Microsoft 365 and
+    Microsoft Intune via Powershell.
+
+.AUTHOR
+    Kevin Wilkins
+    kwilkinsrd@gmail.com
+
+.CREATED
+    02/14/2025
+
+.VERSION
+    0.1.0
+
+.NOTES
+    Set your execution policy as follows:
+    Set-ExecutionPolicy -ExecutionPolicy bypass
 #>
 
 Install-Module -Name ExchangeOnlineManagement -Scope CurrentUser

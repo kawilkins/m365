@@ -1,9 +1,25 @@
 <#
-Author: Kevin Wilkins
-Date: 07/22/2025
-Description:
-This will gather all employee data within the Microsoft tenant
-and export as a CSV file.
+.SYNOPSIS
+    Export user data to CSV.
+
+.DESCRIPTION
+    Script will gather all employee user data and export into a CSV.
+    Script will detect if PowerShell is running on Windows, Linux, or MacOS and
+    export the CSV to the users "Downloads" directory.
+
+.AUTHOR
+    Kevin Wilkins
+    kwilkinsrd@gmail.com
+
+.CREATED
+    07/22/2025
+
+.VERSION
+    0.1.0
+
+.NOTES
+    Cmdlets used and their documentation.
+    - Get-MgUser: https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/get-mguser?view=graph-powershell-1.0
 #>
 
 $graphScopes = @(
@@ -13,7 +29,7 @@ $ConnectMgGraph = @{
     Scopes = $graphScopes
 }
 Connect-MgGraph @ConnectMgGraph
-Write-Host -ForegroundColor Green "Connected to Microsoft Graph"
+Write-Output "Connected to Microsoft Graph"
 
 if ($IsLinux) {
     $csvPath = "/home/$([System.Environment]::UserName)/Downloads"
@@ -22,24 +38,24 @@ if ($IsLinux) {
 } elseif ($IsMacOS) {
     $csvPath = "/Users/$([System.Environment]::UserName)/Downloads"
 } else {
-    Write-Host "OS is not supported by this script"
+    Write-Output "OS is not supported by this script"
 }
 $csvFile = "EmployeeRoster.csv"
 
 $mgUser = @{
     All = $true
-    Property = "DisplayName","UserPrincipalName","Department","JobTitle"
+    Filter = "userType eq 'Member' and accountEnabled eq true"
+    Property = "DisplayName","UserPrincipalName","Department","JobTitle","BusinessPhones","OfficeLocation","StreetAddress","City","PostalCode","UserType","AccountEnabled"
 }
 $select = @{
-    Property = "DisplayName","UserPrincipalName","Department","JobTitle"
+    Property = "DisplayName","UserPrincipalName","Department","JobTitle",@{Name="BusinessPhones";Expression={$_.BusinessPhones -join ";"}},"OfficeLocation","StreetAddress","City","PostalCode"
 }
 $export = @{
     Path = "$csvPath/$csvFile"
     NoTypeInformation = $true
     Encoding = "UTF8"
 }
-
-Get-MgUser @mgUser | Select-Object @select | Export-Csv @export
+Get-MgUser @mgUser | Where-Object { $_.Department } | Sort-Object DisplayName | Select-Object @select | Export-Csv @export
 
 Disconnect-MgGraph
-Write-Host -ForegroundColor Red "Disconnected from Microsoft Graph."
+Write-Output "Disconnected from Microsoft Graph."

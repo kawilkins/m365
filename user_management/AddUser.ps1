@@ -6,10 +6,9 @@
     This script reads a CSV file containing user information and creates multiple Microsoft 365 users.
     Each user is assigned the following:
      1. Random generated password for one time use during onboarding
-     2. All Socket distribution group for company-wide emails
-     3. Crossware signature group for adding company branded signature to outgoing emails.
-     4. KnowBe4 phishing training provisioning group
-     5. Licensing group that will handle provisioning of Microsoft license
+     2. Any distribution groups needed during onboarding
+     3. Any security groups needed during onboarding
+     4. Update employee information in Microsoft
 
 .AUTHOR
     Kevin Wilkins

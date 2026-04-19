@@ -5,17 +5,10 @@
 .DESCRIPTION
     This script reads a CSV file containing user information and creates multiple Microsoft 365 users.
     Each user is assigned the following:
-<<<<<<< HEAD
-     1. Random generated password for one time use during onboarding
-     2. Any distribution groups needed during onboarding
-     3. Any security groups needed during onboarding
-     4. Update employee information in Microsoft
-=======
      1. Random generated password for one time use during onboarding.
      2. Implementation of security by disabling user account upon creation.
      3. Assignment to distibution and security groups.
      4. Clear output indicating user is successfully created.
->>>>>>> fix-adduser-graph
 
 .AUTHOR
     Kevin Wilkins
@@ -165,12 +158,12 @@ foreach ($user in $users) {
         Surname = "$lastName"
         UserPrincipalName = "$email"
         MailNickName = "$userName"
-        AccountEnabled = $false
         PasswordProfile = $passwordProfile
         Department = $user.Department
         JobTitle = $user.JobTitle
         BusinessPhones = $user.BusinessPhones
         OfficeLocation = $user.OfficeLocation
+        AccountEnabled = $false
     }
     New-MgUser @NewMgUser | Out-Null
 

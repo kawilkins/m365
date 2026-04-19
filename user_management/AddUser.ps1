@@ -5,11 +5,10 @@
 .DESCRIPTION
     This script reads a CSV file containing user information and creates multiple Microsoft 365 users.
     Each user is assigned the following:
-     1. Random generated password for one time use during onboarding
-     2. All Socket distribution group for company-wide emails
-     3. Crossware signature group for adding company branded signature to outgoing emails.
-     4. KnowBe4 phishing training provisioning group
-     5. Licensing group that will handle provisioning of Microsoft license
+     1. Random generated password for one time use during onboarding.
+     2. Implementation of security by disabling user account upon creation.
+     3. Assignment to distibution and security groups.
+     4. Clear output indicating user is successfully created.
 
 .AUTHOR
     Kevin Wilkins
@@ -23,7 +22,7 @@
 
 .NOTES
     Cmdlets used and their documentation:
-    - New-Mailbox: https://learn.microsoft.com/en-us/powershell/module/exchange/new-mailbox
+    - New-MgUser: https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/new-mguser?view=graph-powershell-1.0
     - Add-DistributionGroupMember: https://learn.microsoft.com/en-us/powershell/module/exchangepowershell/add-distributiongroupmember?view=exchange-ps
     - Update-MgUser: https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/update-mguser
     - New-GroupMemberByRef: https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.groups/new-groupmemberbyref
@@ -77,8 +76,9 @@ function Add-UserToSecurityGroup {
         [string]$Tenant
     )
 
-    # List security groups on each line ending each line with a ","
+    # List security groups between the () on each line separated by ",".
     $security_groups = @(
+        # Security groups listed here.
     )
     $member = Get-MgUser -Filter "userPrincipalName eq '$($User.UserName)@$Tenant'"
     $body = @{
@@ -103,11 +103,12 @@ function Add-UserToDistributionGroup {
 
     # List distribution groups on each line ending each line with a ",".
     $distribution_groups = @(
+        # Distributions groups listed here.
     )
 
     foreach ($dl in $distribution_groups) {
         $AddDistributionGroupMember = @{
-            Identity = "$dl@$Tenant"
+            Identity = "$dl"
             Member = "$($User.UserName)@$Tenant"
         }
         Add-DistributionGroupMember @AddDistributionGroupMember
@@ -145,38 +146,26 @@ foreach ($user in $users) {
     $passwd = RandomPassword
 
     # Create the new mailbox using the user information as above
-    $NewMailbox = @{
-        Name = $userName
-        Alias = $userName
-        FirstName = $firstName
-        LastName = $lastName
+    # User will be created and set to disabled.
+    Write-Output "Creating new user $userName@$tenant"
+    $passwordProfile = @{
+        Password = "$passwd"
+        ForceChangePasswordNextSignIn = $true
+    }
+    $NewMgUser = @{
         DisplayName = "$firstName $lastName"
-        MicrosoftOnlineServicesID = $email
-        PrimarySmtpAddress = $email
-        Password = (ConvertTo-SecureString -String $passwd -AsPlainText -Force)
-        ResetPasswordOnNextLogon = $true
-    }
-    New-Mailbox @NewMailbox
-
-    #Assign user to distribution groups.
-    $AddUserToDistributionGroup = @{
-        User = $user
-        Tenant = $tenant
-    }
-    Add-UserToDistributionGroup @AddUserToDistributionGroup
-
-    # Add sleep timer to give Exchange time to sync to Intune
-    Start-Sleep -Seconds 15
-
-    # Add user department, job title, and phone number
-    $properties = @{
-        UserId = "$email"
+        GivenName = "$firstName"
+        Surname = "$lastName"
+        UserPrincipalName = "$email"
+        MailNickName = "$userName"
+        AccountEnabled = $false
+        PasswordProfile = $passwordProfile
         Department = $user.Department
         JobTitle = $user.JobTitle
         BusinessPhones = $user.BusinessPhones
         OfficeLocation = $user.OfficeLocation
     }
-    Update-MgUser @properties
+    New-MgUser @NewMgUser | Out-Null
 
     # Set user location to their office location.
     $location = @{
@@ -199,30 +188,36 @@ foreach ($user in $users) {
     }
     Add-UserToSecurityGroup @AddUserToSecurityGroup
 
-    # For security purposes disable the newly created user prior to their start date.
-    Write-Output "Disabling $userName"
-    $UpdateMgUser = @{
-        UserId = "$userName@$tenant"
-        AccountEnabled = $false
-    }
-    Update-MgUser @UpdateMgUser
+    # Add sleep timer to give Intune time to sync to Exchange
+    Start-Sleep -Seconds 60
 
-    Write-Output "Signing out $userName from all sessions."
-    Revoke-MgUserSignInSession -UserId "$userName@$tenant" | Out-Null
+    #Assign user to distribution groups.
+    $AddUserToDistributionGroup = @{
+        User = $user
+        Tenant = $tenant
+    }
+    Add-UserToDistributionGroup @AddUserToDistributionGroup
 
     # Verify that user has been disabled.
-    Start-Sleep -Seconds 5
-    $newUser = Get-MgUser -UserId $userName@$tenant -Property AccountEnabled
-    if ($newUser.AccountEnabled -eq $false) {
-        Write-Output "$userName is DISABLED."
-    } else {
-        Write-Output "$userName is ENABLED."
+    try {
+        $newUser = Get-MgUser -UserId $userName@$tenant -Property AccountEnabled -ErrorAction Stop
+    }
+    catch {
+        Write-Output "User $userName@$tenant was NOT created."
+        continue
     }
 
-    # Write output to the console for confirmation that the user was created and
-    # generate a 'txt' file for easy copy/paste.
+    if ($newUser.AccountEnabled -eq $false) {
+        Write-Output "$userName was successfully created."
+        Write-Output "Account $userName is DISABLED."
+    } else {
+        Write-Output "$userName was successfully created."
+        Write-Output "Account $userName is ENABLED."
+    }
+
+    # Write user information to a text file.
     $output = @{
-        Content = "`n$firstName $lastName`nEmail: $email`nPassword: $passwd`n"
+        Content = "$firstName $lastName`nEmail: $email`nPassword: $passwd`n"
     }
     $output.Content | Out-File -FilePath "created_user.txt" -Encoding UTF8 -Append
 }
